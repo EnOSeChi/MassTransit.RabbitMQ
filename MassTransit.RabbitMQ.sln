@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.RabbitMQ", "MassTransit.RabbitMQ\MassTransit.RabbitMQ.csproj", "{16B50396-C8C0-4393-A2C1-1CBD2AAE7F1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.RabbitMQ.Sample", "MassTransit.RabbitMQ\MassTransit.RabbitMQ.Sample.csproj", "{16B50396-C8C0-4393-A2C1-1CBD2AAE7F1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,15 +1,11 @@
+using MassTransit.RabbitMQ.Sample;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using RabbitMQ.Client;
 
 namespace MassTransit.RabbitMQ
 {
@@ -25,12 +21,44 @@ namespace MassTransit.RabbitMQ
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<MessageConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Message<Message>(x => x.SetEntityName("message"));
+
+                    cfg.Publish<Message>(x =>
+                    {
+                        x.Durable = true; // default: true
+                        x.AutoDelete = false; // default: false
+                        x.ExchangeType = ExchangeType.Topic; // default, allows any valid exchange type
+                    });
+
+                    cfg.ReceiveEndpoint("messages-test", x =>
+                    {
+                        x.ConfigureConsumeTopology = false;
+
+                        x.Consumer<MessageConsumer>(context);
+                        
+                        x.Bind("message", s =>
+                        {
+                            s.RoutingKey = "#";
+                            s.ExchangeType = ExchangeType.Topic;
+                        });
+                    });
+                });
+            });
+            services.AddMassTransitHostedService();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MassTransit.RabbitMQ", Version = "v1" });
             });
+
+            services.AddHostedService<Worker>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
